@@ -14,8 +14,8 @@
 class Server::Impl
 {
 public:
-    Impl(int port, const DataCallback & dataCallback, const DataCompleteCallback & dataCompleteCallback, const ClientDisconnectCallback & clientDisconnectCallback)
-        : _port(port), _dataCallback(dataCallback), _dataCompleteCallback(dataCompleteCallback), _clientDisconnectCallback(clientDisconnectCallback)
+    Impl(int port, const DataCallback & dataCallback, const DataCompleteCallback & dataCompleteCallback, const ClientStateChangedCallback & clientStateChangedCallback)
+        : _port(port), _dataCallback(dataCallback), _dataCompleteCallback(dataCompleteCallback), _clientStateChangedCallback(clientStateChangedCallback)
     {
     }
     ~Impl() {
@@ -25,7 +25,7 @@ public:
     int _port;
     DataCallback  _dataCallback;
     DataCompleteCallback _dataCompleteCallback;
-    ClientDisconnectCallback _clientDisconnectCallback;
+    ClientStateChangedCallback _clientStateChangedCallback;
 
     WSAUser wsaUser;
     SOCKET listenSocket = NULLSOCKET;
@@ -35,8 +35,8 @@ public:
     std::set<ClientConnection*> writingSockets;
 };
 
-Server::Server(int port, const DataCallback & dataCallback, const DataCompleteCallback & dataCompleteCallback, const ClientDisconnectCallback & clientDisconnectCallback)
-    : _d(new Impl(port, dataCallback, dataCompleteCallback, clientDisconnectCallback))
+Server::Server(int port, const DataCallback & dataCallback, const DataCompleteCallback & dataCompleteCallback, const ClientStateChangedCallback & clientStateChangedCallback)
+    : _d(new Impl(port, dataCallback, dataCompleteCallback, clientStateChangedCallback))
 {}
 
 Server::~Server()
@@ -237,7 +237,9 @@ bool Server::poll()
                              inet_ntoa (clientname.sin_addr),
                              ntohs (clientname.sin_port));
                     FD_SET (newConn, &active_fd_set);
-                    _d->clientSockets[newConn] = new ClientConnection(_d.get(), newConn);
+                    ClientConnection* newConnObj  = new ClientConnection(_d.get(), newConn);
+                    _d->clientSockets[newConn] = newConnObj;
+                    _d->_clientStateChangedCallback(newConnObj, ConnectionState::Connected);
                 }
                 else
                 {
@@ -247,7 +249,7 @@ bool Server::poll()
                             ClientConnection * conn = _d->clientSockets[i];
                             _d->writingSockets.erase(conn);
                             _d->clientSockets.erase(i);
-                            _d->_clientDisconnectCallback(conn);
+                            _d->_clientStateChangedCallback(conn, ConnectionState::Disconnected);
                             delete conn;
                             FD_CLR (i, &active_fd_set);
                             deleteSocket = true;

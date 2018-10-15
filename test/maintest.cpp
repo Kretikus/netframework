@@ -2,6 +2,22 @@
 
 #include <serialisation.h>
 
+#define VERIFY(actual, expected) \
+{ \
+    if (actual != expected) { \
+        std::cerr << "Verify failed! " << std::endl; \
+        std::cerr << "Actual: '" << actual << "'" << " Expected: '" << expected << "'" << std::endl; \
+    } \
+} \
+
+#define VERIFY_SIMPLE(actual, expected) \
+{ \
+    if (actual != expected) { \
+        std::cerr << "Verify failed! " << std::endl; \
+    } \
+} \
+
+
 namespace std {
     char * toString(const string & value) {
         return qstrdup(value.c_str());

@@ -26,16 +26,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 HEADERS += \
     client.h \
     coreproto.h \
+    handlerbase.h \
     netutil.h \
+    protocolbase.h \
+    remotecall.h \
     serialisation.h \
     server.h \
-    workerthread.h
+    workerthread.h \
+    consthelpers.hpp \
+    retvalserialisation.h
 
 SOURCES += \
-     client.cpp \
-     main.cpp \
-     server.cpp \
-     netutil.cpp \
-     workerthread.cpp
+    client.cpp \
+    handlerbase.cpp \
+    main.cpp \
+    remotecall.cpp \
+    serialisation.cpp \
+    server.cpp \
+    netutil.cpp \
+    workerthread.cpp
 
 CONFIG += c++14

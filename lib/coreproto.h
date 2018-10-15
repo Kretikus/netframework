@@ -30,5 +30,4 @@ namespace coreproto {
 		if (sz < packetSize + headerSize) return false;
 		return true;
 	}
-
 }

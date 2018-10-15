@@ -16,12 +16,17 @@ PRE_TARGETDEPS += ../lib/libnetf.a
 
 
 HEADERS += \
-    testutil.h
+    testutil.h \
+    serverclienttest.h \
+    helpertest.h
 
 SOURCES += \
     maintest.cpp \
     testutil.cpp \
-    threadtest.cpp
+    threadtest.cpp \
+    serverclienttest.cpp \
+    helpertest.cpp \
+    handlertest.cpp
 
 TARGET = test
 
