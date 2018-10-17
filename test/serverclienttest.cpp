@@ -12,7 +12,7 @@ ServerImpl::ServerImpl()
             );
 }
 
-void ServerImpl::receivedData(const std::vector<char> & d, ClientConnection * conn)
+void ServerImpl::receivedData(const std::vector<char> & /*d*/, ClientConnection * conn)
 {
     if (!conn) return;
 }
@@ -34,14 +34,4 @@ void ServerImpl::clientStateChanged(ClientConnection * conn, ConnectionState::St
 
 ServerClientTest::ServerClientTest()
 {
-}
-
-void Handler::handleData(int id, const std::vector<char> & data)
-{
-
-}
-
-std::string Handler::fnc1(const std::string & arg)
-{
-
 }

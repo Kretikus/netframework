@@ -129,6 +129,7 @@ bool Server::poll()
             fd.fd = asock;
             fd.events = POLLRDNORM;
             pollfds.push_back(fd);
+            _d->_clientStateChangedCallback(_d->clientSockets[asock], ConnectionState::Connected);
         }
 
         for (unsigned int i = 0; i < pollfds.size(); ++i) {
@@ -143,7 +144,7 @@ bool Server::poll()
                 ClientConnection * conn = _d->clientSockets[pollfds[i].fd];
                 _d->writingSockets.erase(conn);
                 _d->clientSockets.erase(pollfds[i].fd);
-                _d->_clientDisconnectCallback(conn);
+                _d->_clientStateChangedCallback(conn, ConnectionState::Disconnected);
                 delete conn;
             }
 
@@ -153,7 +154,7 @@ bool Server::poll()
 
         std::set<ClientConnection*> connectionsToWrite;
         {
-            std::scoped_lock lock(_d->mutex);
+            std::lock_guard<std::mutex> lock(_d->mutex);
             std::swap(_d->writingSockets, connectionsToWrite);
         }
         std::vector<WSAPOLLFD> wPollfds;

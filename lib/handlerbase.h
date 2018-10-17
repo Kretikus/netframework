@@ -1,6 +1,8 @@
 #pragma once
 
 #include <retvalserialisation.h>
+
+#include <functional>
 #include <map>
 
 // this class stores the meta information to be able to send stuff back to the correct client

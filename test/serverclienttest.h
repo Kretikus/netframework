@@ -31,19 +31,6 @@ private:
 };
 
 
-class Handler
-{
-public:
-    void handleData(int id, const std::vector<char>& data);
-
-public:
-    std::string fnc1(const std::string & arg);
-
-private:
-    void registerFnc(const char* name, void(*fnc)());
-};
-
-
 class ServerClientTest : public QObject
 {
     Q_OBJECT
