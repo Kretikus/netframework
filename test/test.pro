@@ -1,3 +1,5 @@
+include("../config.pri")
+
 TEMPLATE = app
 
 CONFIG += c++14
@@ -17,6 +19,8 @@ win32 {
 # the fact that we are linking to it)
 PRE_TARGETDEPS += ../lib/libnetf.a
 
+LIBS += $${EXT_LIBS}
+
 
 HEADERS += \
     testutil.h \
@@ -29,7 +33,8 @@ SOURCES += \
     threadtest.cpp \
     serverclienttest.cpp \
     helpertest.cpp \
-    handlertest.cpp
+    handlertest.cpp \
+    logtest.cpp
 
 TARGET = test
 

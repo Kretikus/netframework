@@ -16,19 +16,19 @@
 
 #include <QDebug>
 
-class ServerImpl
-{
-public:
-    ServerImpl();
+//class ServerImpl
+//{
+//public:
+//    ServerImpl();
 
-    void receivedData(const std::vector<char>&, ClientConnection*);
-    bool isDataComplete(const std::vector<char>&);
-    void clientStateChanged(ClientConnection*, ConnectionState::State);
+//    void receivedData(const std::vector<char>&, ClientConnection*);
+//    bool isDataComplete(const std::vector<char>&);
+//    void clientStateChanged(ClientConnection*, ConnectionState::State);
 
-private:
-    Server * srv;
-    std::map<unsigned int, ClientConnection*> connections;
-};
+//private:
+//    Server * srv;
+//    std::map<unsigned int, ClientConnection*> connections;
+//};
 
 
 class ServerClientTest : public QObject
@@ -36,6 +36,9 @@ class ServerClientTest : public QObject
     Q_OBJECT
 public:
     ServerClientTest();
+
+private slots:
+    void testClientNet();
 };
 
 #endif // SERVERCLIENTTEST_H
