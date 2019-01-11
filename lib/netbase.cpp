@@ -1,13 +1,14 @@
 #include "netbase.h"
-#include "coreproto.h"
 
+#include "coreproto.h"
+#include "handlerbase.h"
+#include "handlermanager.h"
 
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
 #include <functional>
-
 #include <iostream>
 
 enum { max_length = 4048 };
@@ -17,8 +18,10 @@ class SessionImpl {
 public:
     typedef std::function<void (SessionImpl*)> SessionDestroyedFnc;
 public:
-    SessionImpl(boost::asio::io_context &io_context, boost::asio::ssl::context &ssl_context)
-    : socket_(io_context, ssl_context)
+    SessionImpl(boost::asio::io_context &io_context, boost::asio::ssl::context &ssl_context,
+                HandlerManager & handlerManager
+                )
+    : clientId_(-1), socket_(io_context, ssl_context), handlerManager_(handlerManager)
     {}
 
     ~SessionImpl()
@@ -87,7 +90,8 @@ public:
     }
 
     void handlePacket(const std::string & data) {
-        sendData(coreproto::createPacket(data));
+        //sendData(coreproto::createPacket(data));
+        handlerManager_.handlePacket(data, clientId_);
     }
 
     void sendData(const std::vector<char>& data)
@@ -117,10 +121,12 @@ public:
     }
 
 public:
+    int clientId_;
     SslSocket socket_;
     enum { max_length = 1024 };
     char data_[max_length];
     SessionDestroyedFnc destroyedFnc_ = nullptr;
+    HandlerManager & handlerManager_;
 
     std::vector<char> incBuffer_;
     std::vector<char> outBuffer_;
@@ -134,6 +140,8 @@ public:
   boost::asio::io_context io_context_;
   boost::asio::ssl::context ssl_context_ = boost::asio::ssl::context(boost::asio::ssl::context::sslv23);
   boost::asio::ip::tcp::acceptor acceptor_;
+  HandlerManager handlerManager_;
+  std::vector<SessionImpl*> sessions_;
 
 public:
   Impl(unsigned short port)
@@ -143,11 +151,20 @@ public:
           boost::asio::ssl::context::default_workarounds
           | boost::asio::ssl::context::no_sslv2
           | boost::asio::ssl::context::single_dh_use);
+
+      handlerManager_.setSendCallback([this](const std::string& data, int clientId) {
+          auto it = std::find_if(sessions_.begin(), sessions_.end(), [clientId](SessionImpl* session) -> bool {
+                        return session->clientId_ == clientId;
+                     });
+          if (it != sessions_.end()) {
+            (*it)->sendData(coreproto::createPacket(data));
+          }
+      });
     }
 
   void start_accept()
   {
-      SessionImpl* newSession = new SessionImpl(io_context_, ssl_context_);
+      SessionImpl* newSession = new SessionImpl(io_context_, ssl_context_, handlerManager_);
       acceptor_.async_accept(newSession->socket(),
           boost::bind(&Impl::handleAccept, this, newSession,
             boost::asio::placeholders::error));
@@ -164,9 +181,13 @@ public:
   void handleAccept(SessionImpl* newSession,
       const boost::system::error_code& error)
   {
+    static int clientId = 0;
     if (!error) {
+      newSession->clientId_ = clientId++;
       newSession->destroyedFnc_ = [&](SessionImpl* session) { clientSessionDestroyed(session); };
+      sessions_.push_back(newSession);
       newSession->start();
+
     } else {
       delete newSession;
     }
@@ -174,7 +195,7 @@ public:
     start_accept();
   }
 
-  std::vector<SessionImpl*> sessions_;
+
 };
 
 NetBase::NetBase(unsigned short port, const std::string & certificateDir)
@@ -188,6 +209,11 @@ NetBase::NetBase(unsigned short port, const std::string & certificateDir)
 NetBase::~NetBase()
 {
     delete impl_;
+}
+
+void NetBase::registerHandler(HandlerBase *handlerBase)
+{
+    impl_->handlerManager_.registerHandler(handlerBase);
 }
 
 void NetBase::start()

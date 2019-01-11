@@ -4,17 +4,20 @@
 #include <thread>
 #include <mutex>
 #include <queue>
+#include <functional>
 
 class WorkerThread
 {
 public:
-    typedef void (*CallbackFnc)();
+    typedef std::function<void ()> CallbackFnc;
 public:
     /// Constructor
     WorkerThread(const char* threadName);
 
     /// Destructor
     ~WorkerThread();
+
+    const char* threadName() const { return THREAD_NAME; }
 
     /// Called once to create the worker thread
     /// @return TRUE if thread is created. FALSE otherwise.
@@ -25,7 +28,7 @@ public:
 
     /// Get the ID of this thread instance
     /// @return The worker thread ID
-    std::thread::id GetThreadId();
+    std::thread::id GetThreadId() const;
 
     /// Get the ID of the currently executing thread
     /// @return The current thread ID

@@ -5,11 +5,15 @@
 
 typedef std::string ByteBuffer;
 
+class HandlerBase;
+
 class NetBase
 {
 public:
     NetBase(unsigned short port, const std::string & certificateDir);
     ~NetBase();
+
+    void registerHandler(HandlerBase * handlerBase);
 
     void start();
     void stop();

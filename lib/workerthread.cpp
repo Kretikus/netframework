@@ -54,7 +54,7 @@ void WorkerThread::ExitThread()
     m_cv.notify_one();
 }
 
-std::thread::id WorkerThread::GetThreadId()
+std::thread::id WorkerThread::GetThreadId() const
 {
     return thisId;
 }

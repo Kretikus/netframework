@@ -1,18 +1,21 @@
 #pragma once
 
+#include <netinfo.h>
 #include <retvalserialisation.h>
+#include <threadedclass.h>
 
 #include <functional>
 #include <map>
 
-// this class stores the meta information to be able to send stuff back to the correct client
-struct NetInfo {};
-
-class HandlerBase
+class HandlerBase : public ThreadedClass<>
 {
 public:
+    HandlerBase(const char* handlerName);
+    std::string handlerName() const;
+
     void handleCall(const std::string & signature, const std::string & data, const NetInfo& netInfo);
-    virtual void sendAnswer(const NetInfo& netInfo, const std::string & data) = 0;
+
+    virtual void sendAnswer(const NetInfo & netInfo, const std::string & data);
 
 protected:
     std::map<std::string, std::function<void(const std::string&, const NetInfo&)>> functions_;
@@ -40,6 +43,8 @@ protected:
         ObjectDeser deser(in);
         deser >> t1 >> t2 >> t3;
     }
+
+    NetInfo currNetInfo_;
 };
 
 #define REGISTER_RMI0(rettype, name) \

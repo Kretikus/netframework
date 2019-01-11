@@ -4,16 +4,19 @@ TEMPLATE = app
 
 CONFIG += c++14
 CONFIG += console
-CONFIG -= appbundle
+CONFIG -= app_bundle
 
 QT -= gui
 QT += testlib
 
+INCLUDEPATH += ..
 INCLUDEPATH += ../lib
 win32 {
   LIBS += ../lib/debug/netf.lib
+  LIBS += ../dblib/debug/db.lib
 } else {
   LIBS += ../lib/libnetf.a
+  LIBS += ../dblib/libdb.a
 }
 # Specify that we depend on the library (which, logically would be implicit from
 # the fact that we are linking to it)
@@ -34,7 +37,8 @@ SOURCES += \
     serverclienttest.cpp \
     helpertest.cpp \
     handlertest.cpp \
-    logtest.cpp
+    logtest.cpp \
+    dbtest.cpp \
 
 TARGET = test
 

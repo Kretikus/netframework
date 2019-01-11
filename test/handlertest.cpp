@@ -30,7 +30,7 @@ private:
 class AdminHandler : public AdminProtocol, public HandlerBase
 {
 public:
-    AdminHandler()
+    AdminHandler() : HandlerBase("AdminHandler")
     {
         REGISTER_RMI3(int, addUser, const std::string &, std::string &, const std::string &)
     }

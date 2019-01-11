@@ -16,6 +16,8 @@
 #define LOG_HALT  Log(LOG_LEVEL_HALT,  __FILE__, __LINE__, true)
 
 namespace LogDetails {
+    std::string getThreadString();
+
     void output(std::string & msg, double val);
     void output(std::string & msg, int16_t val);
     void output(std::string & msg, int32_t val);

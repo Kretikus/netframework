@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <sys/time.h>
+#include <string>
 #include <thread>
 
 #ifdef __APPLE__
@@ -9,7 +10,7 @@ namespace {
     uint64_t getThreadId()
     {
         uint64_t tid;
-        pthread_threadid_np(NULL, &tid);
+        pthread_threadid_np(nullptr, &tid);
         return tid;
     }
 }
@@ -151,4 +152,9 @@ void Log::log(int level, const char * file, int line, bool halt, const std::stri
     if(halt) {
         assert(false);
     }
+}
+
+std::string LogDetails::getThreadString()
+{
+    return std::to_string(getThreadId());
 }

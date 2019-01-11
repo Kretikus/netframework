@@ -36,6 +36,10 @@ HEADERS += \
     serialisation.h \
     server.h \
     workerthread.h \
+    threadedclass.h \
+    rmipacket.h \
+    netinfo.h \
+    handlermanager.h
 
 SOURCES += \
     client.cpp \
@@ -49,5 +53,9 @@ SOURCES += \
     serialisation.cpp \
     server.cpp \
     workerthread.cpp \
+    threadedclass.cpp \
+    rmipacket.cpp \
+    netinfo.cpp \
+    handlermanager.cpp
 
 CONFIG += c++14
