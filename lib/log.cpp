@@ -1,7 +1,14 @@
 #include "log.h"
 
-#include <cstdio>
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <assert.h>
+#else
 #include <sys/time.h>
+#endif
+
+#include <cstdio>
 #include <string>
 #include <thread>
 
@@ -13,6 +20,11 @@ namespace {
         pthread_threadid_np(nullptr, &tid);
         return tid;
     }
+}
+#elif WIN32
+uint64_t getThreadId()
+{
+    return GetCurrentThreadId();
 }
 #endif
 
@@ -111,8 +123,27 @@ void Log::log(int level, const char * file, int line, bool halt, const std::stri
     msg.resize(60);
     char * pos = static_cast<char *>(&msg[0]);
 
+#ifdef WIN32
     // timestamp
-    struct timeval tp;
+    SYSTEMTIME st;
+    GetSystemTime(&st);
+
+    LogDetails::writePadded(&pos, st.wYear, 4);
+    *(pos++) = '-';
+    LogDetails::writePadded(&pos, st.wMonth, 2, '0');
+    *(pos++) = '-';
+    LogDetails::writePadded(&pos, st.wDay, 2, '0');
+    *(pos++) = ' ';
+    LogDetails::writePadded(&pos, st.wHour, 2, '0');
+    *(pos++) = ':';
+    LogDetails::writePadded(&pos, st.wMinute, 2, '0');
+    *(pos++) = ':';
+    LogDetails::writePadded(&pos, st.wSecond, 2, '0');
+    *(pos++) = '.';
+    LogDetails::writePadded(&pos, st.wMilliseconds, 3, '0');
+#else
+    // timestamp
+    struct ::timeval tp;
     gettimeofday(&tp, nullptr);
 
     struct tm* time = localtime(&tp.tv_sec);
@@ -130,6 +161,8 @@ void Log::log(int level, const char * file, int line, bool halt, const std::stri
     LogDetails::writePadded(&pos, time->tm_sec, 2, '0');
     *(pos++) = '.';
     LogDetails::writePadded(&pos, tp.tv_usec / 1000, 3, '0');
+#endif
+
     *(pos++) = ' ';
     LogDetails::writePadded(&pos, level, 1);
     *(pos++) = ' ';
@@ -138,6 +171,7 @@ void Log::log(int level, const char * file, int line, bool halt, const std::stri
     *(pos++) = ' ';
     LogDetails::writePadded(&pos, (int)getThreadId(), 4);
     *(pos++) = ' ';
+
 
     const char * filename = ::LogDetails::filenameSubStr(file);
     for (int i = 0 ; i < 20 ; ++i) *(pos++) = *filename ? *(filename++) : ' ';

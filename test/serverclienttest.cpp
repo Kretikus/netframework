@@ -47,6 +47,7 @@ ServerClientTest::ServerClientTest()
 void ServerClientTest::testClientNet()
 {
 
+    try {
     qDebug() << "Starting netbase";
     NetBase netbase(7777, "/Users/roman/Development/experiments");
     std::thread thread(std::bind(&NetBase::start, &netbase));
@@ -64,6 +65,9 @@ void ServerClientTest::testClientNet()
 
     netbase.stop();
     thread.join();
+    } catch(const std::exception & ex) {
+        qDebug() << QString::fromLatin1(ex.what());
+    }
 }
 
 

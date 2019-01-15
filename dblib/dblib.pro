@@ -13,11 +13,13 @@ CONFIG += c++14
 HEADERS += \
     db.h \
     dbschema.h \
+    mysql_backend.h
 
 
 SOURCES += \
     db.cpp \
     dbschema.cpp \
+    mysql_backend.cpp
 
 
 OTHER_FILES += \

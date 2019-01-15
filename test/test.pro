@@ -7,20 +7,29 @@ CONFIG += console
 CONFIG -= app_bundle
 
 QT -= gui
+QT += core
 QT += testlib
 
 INCLUDEPATH += ..
 INCLUDEPATH += ../lib
 win32 {
+  # Specify that we depend on the library (which, logically would be implicit from
+  # the fact that we are linking to it)
+  PRE_TARGETDEPS += ../lib/debug/netf.lib ../dblib/debug/db.lib
+
   LIBS += ../lib/debug/netf.lib
   LIBS += ../dblib/debug/db.lib
+
+  INCLUDEPATH += debug/
 } else {
+  # Specify that we depend on the library (which, logically would be implicit from
+  # the fact that we are linking to it)
+  PRE_TARGETDEPS += ../lib/libnetf.a
+
+
   LIBS += ../lib/libnetf.a
   LIBS += ../dblib/libdb.a
 }
-# Specify that we depend on the library (which, logically would be implicit from
-# the fact that we are linking to it)
-PRE_TARGETDEPS += ../lib/libnetf.a
 
 LIBS += $${EXT_LIBS}
 
